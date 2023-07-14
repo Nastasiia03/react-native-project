@@ -7,9 +7,15 @@ import { useFonts } from 'expo-font';
 export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [fontsLoaded] = useFonts({
-        "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-          })
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+    
+
+const [fontsLoaded] = useFonts({
+    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
+      });
+if (!fontsLoaded) {
+return null;
+}
 
 const emailHandler = (text) => setEmail(text);
 const passwordHandler = (text) => setPassword(text);
@@ -18,18 +24,26 @@ const passwordHandler = (text) => setPassword(text);
     console.log(`Email: ${email}, Password: ${password}`)
 }
     
+const keyboardHide = () => {
+    setKeyboardVisible(false);
+    Keyboard.dismiss();
+};
+
+
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={keyboardHide}>
     <View style={styles.container}>
         <ImageBackground source={PhotoBG} resizeMode="cover" style={styles.image}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <SafeAreaView style={styles.area}>
         <View style={styles.form}>
         <Text style={styles.title}>Увійти</Text>
-        <View style={styles.input}><TextInput value={email} placeholder="Адреса електронної пошти" onChangeText={emailHandler} style={styles.text}/></View>
-        <View style={styles.lastInput}><TextInput value={password} placeholder="Пароль" onChangeText={passwordHandler} style={styles.text}/></View>
-        <TouchableOpacity style={styles.btn} onPress={onLogin}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
-            <Text style={styles.confirmation}>Не маєте акаунта? Зареєструватися</Text>
+       
+        <View style={styles.input}><TextInput value={email} placeholder="Адреса електронної пошти" onChangeText={emailHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
+        <View style={{...styles.lastInput, marginBottom: keyboardVisible ? 32 : 43}}><TextInput value={password} placeholder="Пароль" onChangeText={passwordHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
+      {!keyboardVisible && 
+    <View style={styles.btnContainer}><TouchableOpacity style={styles.btn} onPress={onLogin}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
+            <Text style={styles.confirmation}>Не маєте акаунта? Зареєструватися</Text></View>}
             </View>
             </SafeAreaView>
             </KeyboardAvoidingView>
@@ -61,7 +75,6 @@ form: {
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 489,
     paddingTop: 32,
     paddingLeft: 16,
     paddingRight: 16,
@@ -78,7 +91,8 @@ input: {
     height: 50,
     backgroundColor: "#F6F6F6",
     width: "100%",
-    border: "1px solid #E8E8E8",
+    borderWidth: 1, 
+    borderColor: "#E8E8E8",
     borderRadius: 8,
     marginBottom: 16, 
 padding: 16,
@@ -87,10 +101,11 @@ lastInput: {
     height: 50,
     backgroundColor: "#F6F6F6",
     width: "100%",
-    border: "1px solid #E8E8E8",
+    borderWidth: 1, 
+    borderColor: "#E8E8E8",
     borderRadius: 8,
-    marginBottom: 43,
     padding: 16,
+    
 }, 
 text: {
     fontFamily: "Roboto-Regular",
@@ -122,5 +137,8 @@ confirmation: {
 textAlign: "center",
 fontFamily: "Roboto-Regular",
 fontSize: 16,
-    }   
+    },
+ btnContainer: {
+    marginBottom: 144,
+ }
 })

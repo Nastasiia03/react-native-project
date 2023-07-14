@@ -8,8 +8,8 @@ export default function App() {
   
   return (
     <>
-    {/* <RegistrationScreen style={styles.container} /> */}
-    <LoginScreen style={styles.container}/>
+    <RegistrationScreen style={styles.container} />
+    {/* <LoginScreen style={styles.container}/> */}
     </>
   );
 }

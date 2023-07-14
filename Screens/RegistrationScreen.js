@@ -9,6 +9,7 @@ export default function RegistrationScreen() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [fontsLoaded] = useFonts({
 "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
   })
@@ -25,6 +26,11 @@ const onRegister = () => {
     console.log(`Name: ${name}, Email: ${email}, Password: ${password}`)
 }
 
+const keyboardHide = () => {
+    setKeyboardVisible(false);
+    Keyboard.dismiss();
+};
+
 const xml = `
 <svg xmlns="http://www.w3.org/2000/svg" width="132" height="120" viewBox="0 0 132 120" fill="none">
 <rect width="120" height="120" rx="16" fill="#F6F6F6"/>
@@ -34,10 +40,10 @@ const xml = `
 `
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={keyboardHide}>
         <View style={styles.container}>
             <ImageBackground source={PhotoBG} resizeMode="cover" style={styles.image}>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <SafeAreaView style={styles.area}>
             <View style={styles.form}>
                 <View style={styles.avatar}> 
@@ -45,17 +51,18 @@ const xml = `
                 </View>
                 <Text style={styles.title}>Реєстрація</Text>
                 <View style={styles.input}>
-                    <TextInput value={name} placeholder="Логін" onChangeText={nameHandler} style={styles.text}/>              
+                    <TextInput value={name} placeholder="Логін" onChangeText={nameHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>              
                     </View>
             <View style={styles.input}>
-                <TextInput value={email} placeholder="Адреса електронної пошти" onChangeText={emailHandler} style={styles.text}/>
+                <TextInput value={email} placeholder="Адреса електронної пошти" onChangeText={emailHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
                 </View>
-            <View style={styles.lastInput}>
-                <TextInput value={password} placeholder="Пароль" onChangeText={passwordHandler} secureTextEntry={true} style={styles.text}/>
+            <View style={{...styles.lastInput, marginBottom: keyboardVisible ? 32 : 43}}>
+                <TextInput value={password} placeholder="Пароль" onChangeText={passwordHandler} secureTextEntry={true} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
                 </View>
-                
+                {!keyboardVisible &&
+                <View style={styles.btnContainer}>
                 <TouchableOpacity style={styles.btn} onPress={onRegister}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
-            <Text style={styles.confirmation}>Вже маєте акаунт? Увійти</Text>
+            <Text style={styles.confirmation}>Вже маєте акаунт? Увійти</Text></View>}
             </View>
             </SafeAreaView>
             </KeyboardAvoidingView>
@@ -91,11 +98,9 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 0,
         width: "100%",
-        height: 549,
         paddingTop: 92,
         paddingLeft: 16,
         paddingRight: 16,
-        paddingBottom: 78,
         borderTopLeftRadius: 25, 
         borderTopRightRadius: 25, 
     },
@@ -118,7 +123,8 @@ const styles = StyleSheet.create({
         height: 50,
         backgroundColor: "#F6F6F6",
         width: "100%",
-        border: "1px solid #E8E8E8",
+        borderWidth: 1, 
+    borderColor: "#E8E8E8",
         borderRadius: 8,
         marginBottom: 16, 
     padding: 16,
@@ -128,7 +134,8 @@ const styles = StyleSheet.create({
         height: 50,
         backgroundColor: "#F6F6F6",
         width: "100%",
-        border: "1px solid #E8E8E8",
+        borderWidth: 1, 
+    borderColor: "#E8E8E8",
         borderRadius: 8,
         marginBottom: 43,
         padding: 16,
@@ -167,5 +174,8 @@ fontSize: 16,
 textAlign: "center",
 fontFamily: "Roboto-Regular",
 fontSize: 16,
-    }   
+    },
+    btnContainer: {
+        marginBottom: 78,
+     }   
 })
