@@ -5,10 +5,15 @@ import { useFonts } from 'expo-font';
 import PhotoBG from "../assets/images/PhotoBG.png";
 import { SvgXml } from 'react-native-svg';
 
+
+const initialState = {
+name: "",
+email: "",
+password: "" 
+}
+
 export default function RegistrationScreen({navigation}) {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [state, setState] = useState(initialState);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [fontsLoaded] = useFonts({
 "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
@@ -18,17 +23,12 @@ export default function RegistrationScreen({navigation}) {
     return null;
   }
 
-const nameHandler = (text) => setName(text);
-const emailHandler = (text) => setEmail(text);
-const passwordHandler = (text) => setPassword(text);
-    
-const onRegister = () => {
-    console.log(`Name: ${name}, Email: ${email}, Password: ${password}`)
-}
 
 const keyboardHide = () => {
     setKeyboardVisible(false);
     Keyboard.dismiss();
+    console.log(state);
+    setState(initialState);
 };
 
 const xml = `
@@ -51,18 +51,18 @@ const xml = `
                 </View>
                 <Text style={styles.title}>Реєстрація</Text>
                 <View style={styles.input}>
-                    <TextInput value={name} placeholder="Логін" onChangeText={nameHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>              
+                    <TextInput value={state.name} placeholder="Логін" onChangeText={(value)=>setState((prevState) => ({...prevState, name: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>              
                     </View>
             <View style={styles.input}>
-                <TextInput value={email} placeholder="Адреса електронної пошти" onChangeText={emailHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
+                <TextInput value={state.email} placeholder="Адреса електронної пошти" onChangeText={(value)=>setState((prevState) => ({...prevState, email: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
                 </View>
             <View style={{...styles.lastInput, marginBottom: keyboardVisible ? 32 : 43}}>
-                <TextInput value={password} placeholder="Пароль" onChangeText={passwordHandler} secureTextEntry={true} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
+                <TextInput value={state.password} placeholder="Пароль" onChangeText={(value)=>setState((prevState) => ({...prevState, password: value}))} secureTextEntry={true} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
                 </View>
                 {!keyboardVisible &&
                 <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.btn} onPress={onRegister}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
-            <Text style={styles.confirmation}>Вже маєте акаунт? <Text onPress={()=> navigation.navigate('Login')}>Увійти</Text></Text></View>}
+                <TouchableOpacity style={styles.btn} onPress={keyboardHide}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
+            <Text style={styles.confirmation}>Вже маєте акаунт? <Text onPress={()=> navigation.navigate('Login')} style={styles.navigationText}>Увійти</Text></Text></View>}
             </View>
             </SafeAreaView>
             </KeyboardAvoidingView>
@@ -177,5 +177,8 @@ fontSize: 16,
     },
     btnContainer: {
         marginBottom: 78,
-     }   
+    },
+       navigationText: {
+     textDecorationLine: "underline",
+ }
 })
