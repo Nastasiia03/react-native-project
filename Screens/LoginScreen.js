@@ -4,7 +4,7 @@ Keyboard } from "react-native";
 import PhotoBG from "../assets/images/PhotoBG.png";
 import { useFonts } from 'expo-font';
 
-export default function LoginScreen() {
+export default function LoginScreen({navigation}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -43,7 +43,7 @@ const keyboardHide = () => {
         <View style={{...styles.lastInput, marginBottom: keyboardVisible ? 32 : 43}}><TextInput value={password} placeholder="Пароль" onChangeText={passwordHandler} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
       {!keyboardVisible && 
     <View style={styles.btnContainer}><TouchableOpacity style={styles.btn} onPress={onLogin}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
-            <Text style={styles.confirmation}>Не маєте акаунта? Зареєструватися</Text></View>}
+            <Text style={styles.confirmation}>Не маєте акаунта? <Text onPress={()=> navigation.navigate('Registration')}>Зареєструватися</Text></Text></View>}
             </View>
             </SafeAreaView>
             </KeyboardAvoidingView>
@@ -140,5 +140,5 @@ fontSize: 16,
     },
  btnContainer: {
     marginBottom: 144,
- }
+    },
 })

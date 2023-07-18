@@ -5,7 +5,7 @@ import { useFonts } from 'expo-font';
 import PhotoBG from "../assets/images/PhotoBG.png";
 import { SvgXml } from 'react-native-svg';
 
-export default function RegistrationScreen() {
+export default function RegistrationScreen({navigation}) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -62,7 +62,7 @@ const xml = `
                 {!keyboardVisible &&
                 <View style={styles.btnContainer}>
                 <TouchableOpacity style={styles.btn} onPress={onRegister}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
-            <Text style={styles.confirmation}>Вже маєте акаунт? Увійти</Text></View>}
+            <Text style={styles.confirmation}>Вже маєте акаунт? <Text onPress={()=> navigation.navigate('Login')}>Увійти</Text></Text></View>}
             </View>
             </SafeAreaView>
             </KeyboardAvoidingView>
