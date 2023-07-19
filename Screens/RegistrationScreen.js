@@ -31,6 +31,12 @@ const keyboardHide = () => {
     setState(initialState);
 };
 
+    const goToHome = () => {
+    console.log(state);
+    setState(initialState);
+    return navigation.navigate("Home");
+    };
+
 const xml = `
 <svg xmlns="http://www.w3.org/2000/svg" width="132" height="120" viewBox="0 0 132 120" fill="none">
 <rect width="120" height="120" rx="16" fill="#F6F6F6"/>
@@ -61,7 +67,7 @@ const xml = `
                 </View>
                 {!keyboardVisible &&
                 <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.btn} onPress={keyboardHide}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.btn} onPress={goToHome}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
             <Text style={styles.confirmation}>Вже маєте акаунт? <Text onPress={()=> navigation.navigate('Login')} style={styles.navigationText}>Увійти</Text></Text></View>}
             </View>
             </SafeAreaView>

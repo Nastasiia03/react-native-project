@@ -27,7 +27,13 @@ const keyboardHide = () => {
     Keyboard.dismiss();
     console.log(state);
     setState(initialState);
-};
+    };
+    
+const goToHome = () => {
+    console.log(state);
+    setState(initialState);
+    return navigation.navigate("Home");
+    };
 
 
     return (
@@ -42,7 +48,7 @@ const keyboardHide = () => {
         <View style={styles.input}><TextInput value={state.email} placeholder="Адреса електронної пошти" onChangeText={(value)=>setState((prevState) => ({...prevState, email: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
         <View style={{...styles.lastInput, marginBottom: keyboardVisible ? 32 : 43}}><TextInput value={state.password} placeholder="Пароль" onChangeText={(value)=>setState((prevState) => ({...prevState, password: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
       {!keyboardVisible && 
-    <View style={styles.btnContainer}><TouchableOpacity style={styles.btn} onPress={keyboardHide}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
+    <View style={styles.btnContainer}><TouchableOpacity style={styles.btn} onPress={goToHome}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
             <Text style={styles.confirmation}>Не маєте акаунта? <Text onPress={()=> navigation.navigate('Registration')} style={styles.navigationText}>Зареєструватися</Text></Text></View>}
             </View>
             </SafeAreaView>
