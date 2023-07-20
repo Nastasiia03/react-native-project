@@ -12,6 +12,6 @@ export const useRoute = () => {
     return <MainStack.Navigator initialRouteName="Login">
         <MainStack.Screen name="Registration" component={RegistrationScreen} options={{headerShown: false}} />
         <MainStack.Screen name="Login" component={LoginScreen} options={{headerShown: false}}/>
-        <MainStack.Screen name="Home" component={Home} />
+        <MainStack.Screen name="Home" component={Home} options={{headerShown: false}} />
         </MainStack.Navigator> 
 }
