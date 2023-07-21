@@ -1,6 +1,7 @@
 import React from "react";
 import {View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { SimpleLineIcons } from '@expo/vector-icons';
 
 export default function CreatePostsScreen() {
     return <View style={styles.container}>
@@ -12,7 +13,7 @@ export default function CreatePostsScreen() {
         <View style={styles.imageForm}>
             <Text style={styles.formTitle}>Завантажте фото</Text>
             <View style={styles.inputContainer}><View style={styles.formInput}><TextInput  placeholder="Назва..." /></View>
-            <View style={styles.formInput}><TextInput  placeholder="Місцевість..."/></View></View>
+            <View style={styles.formInput}><SimpleLineIcons name="location-pin" size={24} color="rgba(189, 189, 189, 1)"/><TextInput  placeholder="Місцевість..."/></View></View>
             <TouchableOpacity style={styles.btn}><Text style={styles.btnText}>Опублікувати</Text></TouchableOpacity>
             </View>
     </View>
@@ -65,7 +66,8 @@ marginBottom: 32,
         height: 50,
         borderBottomWidth: 1,
         borderBottomColor: "rgba(232, 232, 232, 1)",
-justifyContent: "center",
+        flexDirection: "row",
+alignItems: "center",
     },
     btn: {
     display: "flex",

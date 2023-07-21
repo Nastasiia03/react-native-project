@@ -24,7 +24,7 @@ export default function Home({navigation}) {
             tabBarIcon: ({ focused, size, color }) => (<View style={styles.iconWrapper}><Octicons name="plus" size={20} color="white"/></View>)
         }} name="Створити публікацію" component={CreatePostsScreen} />
     <MainTab.Screen options={{
-            tabBarIcon: ({ focused, size, color }) => (<Feather name="user" size={24} color="black" />)
+            tabBarIcon: ({ focused, size, color }) => (<Feather name="user" size={24} color="black" />), headerShown: false,
         }} name="Профіль" component={ProfileScreen} />
 </MainTab.Navigator>
 }
