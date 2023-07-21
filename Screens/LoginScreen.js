@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View, TextInput, Button, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, TouchableWithoutFeedback, 
 Keyboard } from "react-native";
 import PhotoBG from "../assets/images/PhotoBG.png";
-import { useFonts } from 'expo-font';
+
 
 const initialState = {
     email: "",
@@ -13,14 +13,6 @@ export default function LoginScreen({navigation}) {
     const [state, setState] = useState(initialState);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     
-
-const [fontsLoaded] = useFonts({
-    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-      });
-if (!fontsLoaded) {
-return null;
-}
-
     
 const keyboardHide = () => {
     setKeyboardVisible(false);
@@ -87,10 +79,9 @@ form: {
     borderTopLeftRadius: 25, 
     borderTopRightRadius: 25, 
 },
-title: {
-    fontFamily: "Roboto-Regular", 
+    title: {
+    fontFamily: "Roboto-Medium",
     fontSize: 30,
-    fontWeight: 500,
 marginBottom: 33,
 },
 input: {
@@ -114,7 +105,6 @@ lastInput: {
     
 }, 
 text: {
-    fontFamily: "Roboto-Regular",
     fontSize: 16,
 },
 btn: {
@@ -135,13 +125,11 @@ marginBottom: 16
 btnText: {
 color: "#FFF",
 textAlign: "center",
-fontFamily: "Roboto-Regular",
 fontSize: 16,
 }, 
 confirmation: {
     color: "#1B4371",
 textAlign: "center",
-fontFamily: "Roboto-Regular",
 fontSize: 16,
     },
  btnContainer: {

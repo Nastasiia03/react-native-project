@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TextInput, Button, ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView, TouchableWithoutFeedback, 
 Keyboard, TouchableOpacity } from "react-native";
-import { useFonts } from 'expo-font';
 import PhotoBG from "../assets/images/PhotoBG.png";
 import { SvgXml } from 'react-native-svg';
-
 
 const initialState = {
 name: "",
@@ -15,13 +13,6 @@ password: ""
 export default function RegistrationScreen({navigation}) {
     const [state, setState] = useState(initialState);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
-    const [fontsLoaded] = useFonts({
-"Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-  })
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
 
 const keyboardHide = () => {
@@ -118,10 +109,9 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: -60,
     },
-    title: {
-        fontFamily: "Roboto-Regular", 
+    title: { 
+        fontFamily: "Roboto-Medium",
         fontSize: 30,
-        fontWeight: 500,
     marginBottom: 32,
     },
 
@@ -149,7 +139,6 @@ const styles = StyleSheet.create({
 
 
     text: {
-        fontFamily: "Roboto-Regular",
         fontSize: 16,
     },
 
@@ -171,14 +160,12 @@ marginBottom: 16
     btnText: {
     color: "#FFF",
 textAlign: "center",
-fontFamily: "Roboto-Regular",
 fontSize: 16,
     }, 
 
     confirmation: {
     color: "#1B4371",
 textAlign: "center",
-fontFamily: "Roboto-Regular",
 fontSize: 16,
     },
     btnContainer: {
