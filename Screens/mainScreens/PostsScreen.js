@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     userName: {
         fontFamily: "Roboto-Bold",
         fontSize: 13,
-fontWeight: 700,
     },
     userEmail: {
         fontFamily: "Roboto",
