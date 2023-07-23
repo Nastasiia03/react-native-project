@@ -25,7 +25,7 @@ const keyboardHide = () => {
     const goToHome = () => {
     console.log(state);
     setState(initialState);
-    return navigation.navigate("Home");
+    return navigation.navigate("HomeTabs");
     };
 
 const xml = `

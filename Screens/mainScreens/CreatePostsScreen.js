@@ -52,7 +52,7 @@ alignItems: "center",
         borderRadius: 50
     },
     imageForm: {
-        justifyContent: "start",
+        justifyContent: "flex-start",
         alignItems: "flex-start",
         marginBottom: 120,
     },
