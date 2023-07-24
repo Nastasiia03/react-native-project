@@ -1,21 +1,58 @@
-import React from "react";
-import {View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import React, {useState, useEffect} from "react";
+import {View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 
-export default function CreatePostsScreen() {
+export default function CreatePostsScreen({navigation}) {
+    const [hasPermission, setHasPermission] = useState(null);
+    const [camera, setCamera] = useState(null);
+    const [photo, setPhoto] = useState(null);
+
+    useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+    }, []);
+    if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+    };
+
+    const takePhoto = async () => {
+        if (camera) {
+            const { uri } = await camera.takePictureAsync();
+            await MediaLibrary.createAssetAsync(uri);
+            setPhoto(uri);
+        }
+    };
+
+    const sendPhoto = () => {
+        navigation.navigate("Публікації", {photo}); 
+    }
+
+
     return <View style={styles.container}>
-        <View style={styles.imageContainer}>
-            <View style={styles.iconContainer}>
-                <MaterialIcons name="photo-camera" size={24} color="rgba(189, 189, 189, 1)" />
-            </View>
-        </View>
+        <Camera style={styles.imageContainer} ref={setCamera}>
+            {/* {photo && <View style={styles.takePhotoContainer}>
+                <Image source={{ uri: photo }} style={{ width: 100, height: 100 }} />
+            </View>} */}
+            <TouchableOpacity style={styles.iconContainer} onPress={takePhoto}>
+                <MaterialIcons name="photo-camera" size={24} color="rgba(255, 255, 255, 1)" />
+            </TouchableOpacity>
+        </Camera>
         <View style={styles.imageForm}>
             <Text style={styles.formTitle}>Завантажте фото</Text>
             <View style={styles.inputContainer}><View style={styles.formInput}><TextInput  placeholder="Назва..." /></View>
             <View style={styles.formInput}><SimpleLineIcons name="location-pin" size={24} color="rgba(189, 189, 189, 1)"/><TextInput  placeholder="Місцевість..."/></View></View>
-            <TouchableOpacity style={styles.btn}><Text style={styles.btnText}>Опублікувати</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.btn} onPress={sendPhoto}><Text style={styles.btnText}>Опублікувати</Text></TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.deleteBtn}><Feather name="trash-2" size={24} color="rgba(189, 189, 189, 1)" /></TouchableOpacity>
     </View>
@@ -36,8 +73,6 @@ const styles = StyleSheet.create({
        width: 343,
         height: 240,
         borderRadius: 8, 
-        borderWidth: 1,
-        borderColor: "#E8E8E8",
         backgroundColor: "rgba(246, 246, 246, 1)",
         alignItems: "center",
         justifyContent: "center",
@@ -46,7 +81,7 @@ const styles = StyleSheet.create({
     iconContainer: {
        width: 60,
         height: 60,
-        backgroundColor: "white",
+        backgroundColor: "rgba(255, 255, 255, 0.30)",
 alignItems: "center",
         justifyContent: "center",
         borderRadius: 50
@@ -100,5 +135,12 @@ fontSize: 16,
         display: "flex",
         justifyContent: "center", 
         alignItems: "center"
+    },
+    takePhotoContainer: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        borderColor: "#fff",
+        borderWidth: 1, 
     }
 })
