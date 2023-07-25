@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Button } from "react-native";
+import { Feather } from '@expo/vector-icons'; 
+import { SimpleLineIcons } from '@expo/vector-icons';
 
-
-export default function PostsScreen({route}) {
+export default function PostsScreen({route, navigation}) {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -17,12 +18,24 @@ export default function PostsScreen({route}) {
             <Image source={{uri: "https://brighterwriting.com/wp-content/uploads/icon-user-default.png"}} style={styles.image}></Image>
             <View style={styles.textContainer}>
             <Text style={styles.userName}>User Name</Text>
-                <Text style={styles.userEmail}>User Email</Text>
-                <FlatList data={posts} keyExtractor={(item, index) => index.toString()} renderItem={({ item }) => <View style={{marginBottom: 10}}><Image source={{ uri: item.photo }} style={{height: 200, width: 200}} /></View>} />
-
-                
-            </View>
+                <Text style={styles.userEmail}>User Email</Text>    
+            </View>    
         </View>
+        <View style={styles.postsList}><FlatList data={posts} keyExtractor={(item, index) => index.toString()} renderItem={({ item }) => <View style={{ marginBottom: 10 }}>
+                <Image source={{ uri: item.photo }} style={styles.photo} />
+                <Text style={styles.name}>{item.info.postName}</Text>
+            <View style={styles.postsContainer}>
+                <View style={styles.infoContainer}>
+                <TouchableOpacity onPress={() => navigation.navigate("Коментарі")}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
+                <Text style={styles.count}>0</Text></View>
+                <View style={styles.infoContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Локації", { location: item.location })}><SimpleLineIcons name="location-pin" size={24} style={styles.locationIcon} />
+                    </TouchableOpacity>
+                <Text style={styles.location}>{item.info.locationName}</Text>
+            </View>
+            </View>
+        </View>} />
+            </View>
     </View>
 }; 
 
@@ -38,7 +51,8 @@ const styles = StyleSheet.create({
     },
     userContainer: {
     flexDirection: "row", 
-    alignItems: 'center',
+        alignItems: 'center',
+    marginBottom: 32,
     },
     image: {
         width: 60, 
@@ -57,5 +71,49 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto",
         fontSize: 11,
         color: "rgba(33, 33, 33, 0.80)",
+    },
+    postsList: {
+        alignItems: "center",
+        flex:1,
+    },
+    photo: {
+        width: 343,
+        height: 240,
+        borderRadius: 8,
+marginBottom: 8,
+    },
+    postsContainer: {
+        flex: 1,
+        flexDirection: "row", 
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+    infoContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    name: {
+        fontFamily: "Roboto-Medium",
+        fontSize: 16,
+        marginBottom: 8,
+    },
+    count: {
+        color: "rgba(189, 189, 189, 1)",
+        fontSize: 16,
+    },
+    comment: {
+        marginRight: 6,
+        color: "rgba(189, 189, 189, 1)",
+    },
+    locationIcon: {
+        marginRight: 4,
+        color: "rgba(189, 189, 189, 1)",
+    },
+    location: {
+textAlign: "right",
+fontFamily: "Roboto",
+fontSize: 16,
+        textDecorationLine: "underline",
+
     }
 })

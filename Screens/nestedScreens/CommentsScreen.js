@@ -12,7 +12,9 @@ export default function CommentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+     backgroundColor: "white",
+        paddingTop: 32, 
+        paddingLeft: 16,
+        paddingRight: 16,
   },
 });

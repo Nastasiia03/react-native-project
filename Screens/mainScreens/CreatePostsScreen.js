@@ -5,54 +5,91 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
+
+const initialState = {
+    postName: "",
+    locationName: ""
+};
 
 export default function CreatePostsScreen({navigation}) {
     const [hasPermission, setHasPermission] = useState(null);
     const [camera, setCamera] = useState(null);
     const [photo, setPhoto] = useState(null);
+    const [location, setLocation] = useState(null);
+    const [info, setInfo] = useState(initialState);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      await MediaLibrary.requestPermissionsAsync();
-
-      setHasPermission(status === "granted");
-    })();
-    }, []);
-    if (hasPermission === null) {
-    return <View />;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    const requestCameraPermission = async () => {
+        const { status } = await Camera.requestCameraPermissionsAsync();
+        await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Camera permission denied");
+      } else {
+        setHasPermission(status === "granted");
+      }
     };
 
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+      const locationData = await Location.getCurrentPositionAsync({});
+      setLocation(locationData);
+    })();
+
+        requestCameraPermission();
+        setIsButtonDisabled(true);
+    }, []);
+
+
     const takePhoto = async () => {
-        if (camera) {
-            const { uri } = await camera.takePictureAsync();
-            await MediaLibrary.createAssetAsync(uri);
-            setPhoto(uri);
-        }
+        try {
+            if (camera) {
+                const { uri } = await camera.takePictureAsync();
+                await MediaLibrary.createAssetAsync(uri);
+                setPhoto(uri);
+            
+                let locationRef = await Location.getCurrentPositionAsync({});
+                console.log(locationRef)
+                const coords = {
+                    latitude: locationRef.coords.latitude,
+                    longitude: locationRef.coords.longitude,
+                };
+
+                setLocation(coords);
+                setIsButtonDisabled(false);  
+            }
+        } catch (error) {
+      console.log(error);
+    }
     };
 
     const sendPhoto = () => {
-        navigation.navigate("Публікації", {photo}); 
+        navigation.navigate("Публікації", { photo, location, info });
+        setInfo(initialState);
+        setIsButtonDisabled(true);
     }
 
 
     return <View style={styles.container}>
+        <View style={styles.cameraWrapper}>
         <Camera style={styles.imageContainer} ref={setCamera}>
-            {/* {photo && <View style={styles.takePhotoContainer}>
-                <Image source={{ uri: photo }} style={{ width: 100, height: 100 }} />
-            </View>} */}
+            {photo && <View style={styles.takePhotoContainer}>
+                <Image source={{ uri: photo }} style={{ width: 100, height: 100, borderRadius: 8 }} />
+            </View>}
             <TouchableOpacity style={styles.iconContainer} onPress={takePhoto}>
                 <MaterialIcons name="photo-camera" size={24} color="rgba(255, 255, 255, 1)" />
             </TouchableOpacity>
-        </Camera>
+            </Camera>
+            </View>
         <View style={styles.imageForm}>
             <Text style={styles.formTitle}>Завантажте фото</Text>
-            <View style={styles.inputContainer}><View style={styles.formInput}><TextInput  placeholder="Назва..." /></View>
-            <View style={styles.formInput}><SimpleLineIcons name="location-pin" size={24} color="rgba(189, 189, 189, 1)"/><TextInput  placeholder="Місцевість..."/></View></View>
-            <TouchableOpacity style={styles.btn} onPress={sendPhoto}><Text style={styles.btnText}>Опублікувати</Text></TouchableOpacity>
+            <View style={styles.inputContainer}><View style={styles.formInput}><TextInput value={info.postName} onChangeText={(value)=>setInfo((prevState) => ({...prevState, postName: value}))} placeholder="Назва..." /></View>
+            <View style={styles.formInput}><SimpleLineIcons name="location-pin" size={24} color="rgba(189, 189, 189, 1)"/><TextInput value={info.locationName} onChangeText={(value)=>setInfo((prevState) => ({...prevState, locationName: value}))} placeholder="Місцевість..."/></View></View>
+            <TouchableOpacity disabled={isButtonDisabled} style={isButtonDisabled ? styles.btn : styles.activeBtn} onPress={sendPhoto}><Text style={isButtonDisabled ? styles.btnText : styles.activeBtnText}>Опублікувати</Text></TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.deleteBtn}><Feather name="trash-2" size={24} color="rgba(189, 189, 189, 1)" /></TouchableOpacity>
     </View>
@@ -69,14 +106,19 @@ const styles = StyleSheet.create({
         paddingBottom: 34,
         
     },
-    imageContainer: {
-       width: 343,
+    cameraWrapper: {
+        borderRadius: 8,
+         width: 343,
         height: 240,
-        borderRadius: 8, 
-        backgroundColor: "rgba(246, 246, 246, 1)",
-        alignItems: "center",
-        justifyContent: "center",
         marginBottom: 8,
+        overflow: "hidden",    
+    },
+    imageContainer: {
+        flex:1,
+       width: "100%",
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",      
     },
     iconContainer: {
        width: 60,
@@ -122,8 +164,25 @@ alignItems: "center",
         backgroundColor: "#F6F6F6",  
 
     },
+    activeBtn: {
+display: "flex",
+    width: 343,
+    paddingTop: 16,
+    paddingLeft: 32,
+    paddingRight: 32,
+    paddingBottom: 16,
+    flexDirection: "column",
+    alignItems: "center",
+    borderRadius: 100,
+        backgroundColor: "#FF6C00", 
+    },
     btnText: {
     color: "#BDBDBD",
+fontFamily: "Roboto",
+fontSize: 16,
+    },
+    activeBtnText: {
+color: "rgba(255, 255, 255, 1)",
 fontFamily: "Roboto",
 fontSize: 16,
     },
@@ -142,5 +201,6 @@ fontSize: 16,
         left: 0,
         borderColor: "#fff",
         borderWidth: 1, 
+        borderRadius: 8,
     }
 })

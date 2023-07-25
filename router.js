@@ -31,9 +31,7 @@ return <MainTab.Navigator screenOptions={{ tabBarShowLabel: false, tabBarStyle: 
         <MainTab.Screen options={{
             title: "Публікації",
             tabBarIcon: ({ focused, size, color }) => (<AntDesign name="appstore-o" size={24} color="black" />),
-            headerRight: () => (<TouchableOpacity  style={styles.logout} onPress={() => navigation.navigate("Login")}>
-                <MaterialIcons name="logout" size={24} color="rgba(189, 189, 189, 1)" />
-            </TouchableOpacity>),
+            headerShown: false,
         }} name="Home" component={Home} />
         <MainTab.Screen options={{
             tabBarIcon: ({ focused, size, color }) => (<View style={styles.iconWrapper}><Octicons name="plus" size={20} color="white" /></View>),
