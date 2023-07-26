@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TextInput, Button, ImageBackground, KeyboardAvo
 Keyboard, TouchableOpacity } from "react-native";
 import PhotoBG from "../assets/images/PhotoBG.png";
 import { SvgXml } from 'react-native-svg';
+import { useDispatch} from "react-redux";
+import {authSignUpUser} from "../redux/auth/authOperations";
 
 const initialState = {
 name: "",
@@ -13,7 +15,7 @@ password: ""
 export default function RegistrationScreen({navigation}) {
     const [state, setState] = useState(initialState);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
-
+    const dispatch = useDispatch();
 
 const keyboardHide = () => {
     setKeyboardVisible(false);
@@ -23,8 +25,9 @@ const keyboardHide = () => {
 };
 
     const goToHome = () => {
-    console.log(state);
-    setState(initialState);
+    // console.log(state);
+        setState(initialState);
+        dispatch(authSignUpUser(state));
     return navigation.navigate("HomeTabs");
     };
 
