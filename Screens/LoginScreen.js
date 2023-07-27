@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View, TextInput, Button, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView, TouchableWithoutFeedback, 
 Keyboard } from "react-native";
 import PhotoBG from "../assets/images/PhotoBG.png";
-
+import { authSignInUser } from "../redux/auth/authOperations";
+import { useDispatch } from "react-redux";
 
 const initialState = {
     email: "",
@@ -12,7 +13,7 @@ const initialState = {
 export default function LoginScreen({navigation}) {
     const [state, setState] = useState(initialState);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
-    
+    const dispatch = useDispatch();
     
 const keyboardHide = () => {
     setKeyboardVisible(false);
@@ -21,10 +22,10 @@ const keyboardHide = () => {
     setState(initialState);
     };
     
-const goToHome = () => {
-    console.log(state);
+const handleSubmit = () => {
+    // console.log(state);
     setState(initialState);
-    return navigation.navigate("HomeTabs");
+    dispatch(authSignInUser(state));
     };
 
 
@@ -40,7 +41,7 @@ const goToHome = () => {
         <View style={styles.input}><TextInput value={state.email} placeholder="Адреса електронної пошти" onChangeText={(value)=>setState((prevState) => ({...prevState, email: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
         <View style={{...styles.lastInput, marginBottom: keyboardVisible ? 32 : 43}}><TextInput value={state.password} placeholder="Пароль" onChangeText={(value)=>setState((prevState) => ({...prevState, password: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)}  onSubmitEditing={() => setKeyboardVisible(false)}/></View>
       {!keyboardVisible && 
-    <View style={styles.btnContainer}><TouchableOpacity style={styles.btn} onPress={goToHome}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
+    <View style={styles.btnContainer}><TouchableOpacity style={styles.btn} onPress={handleSubmit}><Text style={styles.btnText}>Увійти</Text></TouchableOpacity>
             <Text style={styles.confirmation}>Не маєте акаунта? <Text onPress={()=> navigation.navigate('Registration')} style={styles.navigationText}>Зареєструватися</Text></Text></View>}
             </View>
             </SafeAreaView>

@@ -50,9 +50,11 @@ export const useRoute = (isAuth) => {
         return <MainStack.Navigator initialRouteName="Login">
             <MainStack.Screen name="Registration" component={RegistrationScreen} options={{ headerShown: false }} />
             <MainStack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-            <MainStack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
         </MainStack.Navigator>
     }
+    return <MainStack.Navigator>
+        <MainStack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+    </MainStack.Navigator>
 };
     
 

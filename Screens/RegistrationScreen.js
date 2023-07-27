@@ -7,7 +7,7 @@ import { useDispatch} from "react-redux";
 import {authSignUpUser} from "../redux/auth/authOperations";
 
 const initialState = {
-name: "",
+nickname: "",
 email: "",
 password: "" 
 }
@@ -24,11 +24,10 @@ const keyboardHide = () => {
     setState(initialState);
 };
 
-    const goToHome = () => {
+    const handleSubmit = () => {
     // console.log(state);
         setState(initialState);
         dispatch(authSignUpUser(state));
-    return navigation.navigate("HomeTabs");
     };
 
 const xml = `
@@ -51,7 +50,7 @@ const xml = `
                 </View>
                 <Text style={styles.title}>Реєстрація</Text>
                 <View style={styles.input}>
-                    <TextInput value={state.name} placeholder="Логін" onChangeText={(value)=>setState((prevState) => ({...prevState, name: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>              
+                    <TextInput value={state.nickname} placeholder="Логін" onChangeText={(value)=>setState((prevState) => ({...prevState, nickname: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>              
                     </View>
             <View style={styles.input}>
                 <TextInput value={state.email} placeholder="Адреса електронної пошти" onChangeText={(value)=>setState((prevState) => ({...prevState, email: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
@@ -61,7 +60,7 @@ const xml = `
                 </View>
                 {!keyboardVisible &&
                 <View style={styles.btnContainer}>
-                <TouchableOpacity style={styles.btn} onPress={goToHome}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.btn} onPress={handleSubmit}><Text style={styles.btnText}>Зареєструватися</Text></TouchableOpacity>
             <Text style={styles.confirmation}>Вже маєте акаунт? <Text onPress={()=> navigation.navigate('Login')} style={styles.navigationText}>Увійти</Text></Text></View>}
             </View>
             </SafeAreaView>
