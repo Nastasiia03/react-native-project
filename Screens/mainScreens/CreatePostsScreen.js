@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { SimpleLineIcons } from '@expo/vector-icons';
@@ -6,6 +7,9 @@ import { Feather } from '@expo/vector-icons';
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
+import { storage, db } from "../../firebase/config";
+import { getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
 
 const initialState = {
     postName: "",
@@ -19,6 +23,8 @@ export default function CreatePostsScreen({navigation}) {
     const [location, setLocation] = useState(null);
     const [info, setInfo] = useState(initialState);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+    const {userId, nickname } = useSelector((state) => state.auth);
 
     useEffect(() => {
     const requestCameraPermission = async () => {
@@ -67,12 +73,35 @@ export default function CreatePostsScreen({navigation}) {
     }
     };
 
-    const sendPhoto = () => {
+
+    const uploadPhotoToServer = async () => {
+        const response = await fetch(photo);
+        const file = await response.blob();
+
+        const uniquePostId = Date.now().toString();
+
+        const storageRef = ref(storage, `postImage/${uniquePostId}`);
+
+         await uploadBytes(storageRef, file);
+        
+        const processedPhoto = await getDownloadURL(storageRef);
+
+        return processedPhoto;
+    };
+
+    const uploadPostToServer = async () => {
+        const photo = await uploadPhotoToServer();
+        await addDoc(collection(db, "posts"), { photo, info, location, userId, nickname });
+    };
+
+       const sendPhoto = () => {
         navigation.navigate("Публікації", { photo, location, info });
         setInfo(initialState);
-        setIsButtonDisabled(true);
-    }
-
+           setIsButtonDisabled(true);
+           uploadPostToServer();
+           console.log(info);
+           console.log(location);
+    };
 
     return <View style={styles.container}>
         <View style={styles.cameraWrapper}>
