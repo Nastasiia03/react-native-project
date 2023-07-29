@@ -60,9 +60,14 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
 };
 
 export const authSignOutUser = () => async (dispatch, getState) => { 
-  await auth.signOut();
-
-  dispatch(authSlice.actions.authSignOut());
+  try {
+    await auth.signOut();
+    console.log('User signed out successfully.');
+    dispatch(authSlice.actions.authSignOut());
+  } catch (error) {
+    console.error('Error occurred during sign-out:', error.message);
+    // You can also add more specific error handling based on the error code if needed.
+  }
 };
 
 

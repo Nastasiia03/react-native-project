@@ -2,15 +2,24 @@ import React, {useState, useEffect} from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Button } from "react-native";
 import { Feather } from '@expo/vector-icons'; 
 import { SimpleLineIcons } from '@expo/vector-icons';
+import { db } from "../../firebase/config";
+import {collection, onSnapshot} from "firebase/firestore";
 
 export default function PostsScreen({route, navigation}) {
     const [posts, setPosts] = useState([]);
+    
+    
+    const getAllPosts = async () => {
+        await onSnapshot(collection(db, "posts"), (data) => {
+            const posts = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+            setPosts(posts);
+        });
+    };
 
     useEffect(() => {
-        if (route.params) {
-            setPosts(prevState => [...prevState, route.params]);
-        }
-}, [route.params])
+        getAllPosts();
+
+}, [])
 
 
     return <View style={styles.container}>
@@ -26,7 +35,7 @@ export default function PostsScreen({route, navigation}) {
                 <Text style={styles.name}>{item.info.postName}</Text>
             <View style={styles.postsContainer}>
                 <View style={styles.infoContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate("Коментарі")}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
                 <Text style={styles.count}>0</Text></View>
                 <View style={styles.infoContainer}>
                     <TouchableOpacity onPress={() => navigation.navigate("Локації", { location: item.location })}><SimpleLineIcons name="location-pin" size={24} style={styles.locationIcon} />

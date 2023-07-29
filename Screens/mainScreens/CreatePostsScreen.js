@@ -95,7 +95,7 @@ export default function CreatePostsScreen({navigation}) {
     };
 
        const sendPhoto = () => {
-        navigation.navigate("Публікації", { photo, location, info });
+        navigation.navigate("Публікації");
         setInfo(initialState);
            setIsButtonDisabled(true);
            uploadPostToServer();
