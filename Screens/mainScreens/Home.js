@@ -7,7 +7,7 @@ import PostsScreen from "./PostsScreen";
 import CommentsScreen from "../nestedScreens/CommentsScreen";
 import MapScreen from "../nestedScreens/MapScreen";
 import { MaterialIcons } from '@expo/vector-icons';
-import { auth } from "../../firebase/config";
+import { db } from "../../firebase/config";
 import { useDispatch } from "react-redux";
 import { authSignOutUser } from "../../redux/auth/authOperations";
 
@@ -27,7 +27,7 @@ export default function Home({ navigation }) {
 
     const signOut = () => {
         dispatch(authSignOutUser());
-    };
+        };
 
     return <HomeStack.Navigator>
         <HomeStack.Screen name="Публікації" component={PostsScreen} options={{

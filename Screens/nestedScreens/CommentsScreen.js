@@ -1,14 +1,28 @@
-import React, {useState} from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import React, {useState, useEffect} from "react";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, SafeAreaView, ScrollView } from "react-native";
 import { db } from "../../firebase/config";
 import { useSelector } from "react-redux";
 import { doc, collection, addDoc, getDocs, onSnapshot,} from "firebase/firestore";
 
 export default function CommentsScreen({route}) {
   const [comment, setComment] = useState("");
+  const [allComments, setAllComments] = useState([]);
   const { postId } = route.params;
-  const { nickname } = useSelector(state => state.auth);
+  const { nickname, stateChange } = useSelector(state => state.auth);
+  let unsubscribeListener;
   
+useEffect(() => {
+  if(stateChange) {
+  getAllComments();
+};
+
+return () => {
+  if (unsubscribeListener) {
+      unsubscribeListener();
+  }
+
+}}, [stateChange]);
+
   const createComment = async () => {
   const docRef = await doc(db, "posts", postId);
 
@@ -20,8 +34,39 @@ export default function CommentsScreen({route}) {
     setComment("");
   };
 
+  const getAllComments = async () => {
+    const docRef = await doc(db, "posts", postId);
+
+    unsubscribeListener = await onSnapshot(collection(docRef, "comments"), (data) =>
+        setAllComments(
+          data.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }))
+        ));
+  };
+
   return (
     <View style={styles.container}>
+    <SafeAreaView style={styles.wrapper}>
+              <FlatList
+                data={allComments}
+                renderItem={({ item }) => (
+                  (
+                    <View style={styles.wrapperComment}>
+                      <View style={styles.commentContainer}>
+                        <Text style={styles.userName}>{item.nickname}</Text>
+                        <Text style={styles.userComment}>{item.comment}</Text>
+                        {/* <Text style={styles.userPostedDate}>
+                          {item.postedDate}
+                        </Text> */}
+                      </View>
+                    </View>
+                  )
+                )}
+                keyExtractor={(item) => item.id}
+              />
+            </SafeAreaView>
       <View style={styles.formInput}><TextInput onChangeText={setComment} placeholder="Коментар..."/></View>
             <TouchableOpacity  style={styles.activeBtn} onPress={createComment}><Text style={styles.activeBtnText}>Залишити коментар</Text></TouchableOpacity>
     </View >
@@ -35,8 +80,40 @@ const styles = StyleSheet.create({
         paddingTop: 32, 
         paddingLeft: 16,
     paddingRight: 16,
-    justifyContent: "flex-end",
     alignItems: "center",
+  },
+  wrapper: {
+    height: 350,
+    alignItems: "flex-end",
+
+    // borderColor: "black",
+    // borderWidth: 2,
+  },
+  wrapperComment: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  commentContainer: {
+    padding: 16,
+    marginBottom: 24,
+    borderRadius: 6,
+    backgroundColor: "rgba(0, 0, 0, 0.03)",
+    borderColor: "rgba(0, 0, 0, 0.03)",
+    width: 299,
+  },
+  userName: {
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontSize: 13,
+    lineHeight: 18,
+    color: "#BDBDBD",
+  },
+  userComment: {
+    fontFamily: "Roboto",
+    fontStyle: "normal",
+    fontSize: 13,
+    lineHeight: 18,
+    color: "#212121",
   },
       activeBtn: {
 display: "flex",

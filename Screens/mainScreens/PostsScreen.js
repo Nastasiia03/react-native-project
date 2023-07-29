@@ -4,22 +4,31 @@ import { Feather } from '@expo/vector-icons';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { db } from "../../firebase/config";
 import {collection, onSnapshot} from "firebase/firestore";
+import { useSelector } from "react-redux";
 
 export default function PostsScreen({route, navigation}) {
     const [posts, setPosts] = useState([]);
-    
+    const { stateChange } = useSelector(state => state.auth);
+    let unsubscribeListener;
     
     const getAllPosts = async () => {
-        await onSnapshot(collection(db, "posts"), (data) => {
+        unsubscribeListener = await onSnapshot(collection(db, "posts"), (data) => {
             const posts = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
             setPosts(posts);
         });
     };
 
     useEffect(() => {
+        if(stateChange) {
         getAllPosts();
+    };
 
-}, [])
+        return () => {
+            if (unsubscribeListener) {
+                unsubscribeListener();
+            }
+
+}}, [stateChange]);
 
 
     return <View style={styles.container}>
