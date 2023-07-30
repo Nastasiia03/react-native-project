@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 export default function PostsScreen({route, navigation}) {
     const [posts, setPosts] = useState([]);
     const [commentsCount, setCommentsCount] = useState({});
-    const { stateChange, nickname, email } = useSelector(state => state.auth);
+    const { stateChange, nickname, email, photo } = useSelector(state => state.auth);
     let unsubscribePosts;
     let unsubscribe; 
     
@@ -72,7 +72,7 @@ useEffect(() => {
 
     return <View style={styles.container}>
         <View style={styles.userContainer}>
-            <Image source={{uri: "https://brighterwriting.com/wp-content/uploads/icon-user-default.png"}} style={styles.image}></Image>
+            <Image source={photo} style={styles.image}></Image>
             <View style={styles.textContainer}>
             <Text style={styles.userName}>{nickname}</Text>
                 <Text style={styles.userEmail}>{email}</Text>    

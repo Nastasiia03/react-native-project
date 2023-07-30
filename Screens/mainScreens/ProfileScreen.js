@@ -11,7 +11,7 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 export default function ProfileScreen({route, navigation}) {
     const [userPosts, setUserPosts] = useState([]);
     const [commentsCount, setCommentsCount] = useState({});
-    const { userId, stateChange, nickname } = useSelector(state => state.auth);
+    const { userId, stateChange, nickname, photo } = useSelector(state => state.auth);
     let unsubscribeListener;
     let unsubscribe;
 
@@ -79,7 +79,7 @@ const getCommentsCount = async (postId) => {
     return <View style={styles.container}>
         <ImageBackground source={PhotoBG} resizeMode="cover" style={styles.image}>
             <View style={styles.profile}>
-                <Image style={styles.avatar} source={{ uri: "https://brighterwriting.com/wp-content/uploads/icon-user-default.png" }} />
+                <Image style={styles.avatar} source={photo} />
                 <TouchableOpacity style={styles.changeBtn}><AntDesign name="closecircleo" size={24} color="#E8E8E8" /></TouchableOpacity>
                 <Text style={styles.userName}>{nickname}</Text>
                 <View style={styles.postsList}><FlatList data={userPosts} keyExtractor={(item, index) => index.toString()} renderItem={({ item }) => <View style={{ marginBottom: 10 }}>

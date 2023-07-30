@@ -1,20 +1,24 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, Button, ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView, TouchableWithoutFeedback, 
-Keyboard, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TextInput, Button, ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Image} from "react-native";
+import * as ImagePicker from 'expo-image-picker';
+import * as MediaLibrary from 'expo-media-library';
 import PhotoBG from "../assets/images/PhotoBG.png";
-import { SvgXml } from 'react-native-svg';
+import { EvilIcons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import { useDispatch} from "react-redux";
 import {authSignUpUser} from "../redux/auth/authOperations";
 
 const initialState = {
 nickname: "",
 email: "",
-password: "" 
+password: "", 
+photo: null,
 }
 
 export default function RegistrationScreen({navigation}) {
     const [state, setState] = useState(initialState);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [photo, setPhoto] = useState(null);
     const dispatch = useDispatch();
 
 const keyboardHide = () => {
@@ -22,8 +26,35 @@ const keyboardHide = () => {
     Keyboard.dismiss();
     console.log(state);
     setState(initialState);
+    };
+
+const handlePhotoSelection = async () => {
+  try {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to access your photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (result.assets.length > 0) {
+      setPhoto(result.assets[0]);
+    }
+  } catch (error) {
+    console.log('Error picking image', error);
+  }
 };
 
+    const clearPhoto = () => {
+    setPhoto(null);
+    };
+    
     const handleSubmit = () => {
     // console.log(state);
         setState(initialState);
@@ -45,9 +76,14 @@ const xml = `
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <SafeAreaView style={styles.area}>
             <View style={styles.form}>
-                <View style={styles.avatar}> 
-                <SvgXml xml={xml}/>
-                </View>
+            {photo ? (
+            <View style={styles.avatar}>
+                <Image source={{ uri: photo.uri }} style={styles.photo} />
+                <TouchableOpacity onPress={clearPhoto} style={styles.avatarBtn}><AntDesign name="closecircleo" size={23} style={styles.avatarIcon} /></TouchableOpacity></View>
+  ) : (
+    <View style={styles.avatar}>
+                <TouchableOpacity onPress={handlePhotoSelection} style={styles.avatarBtn}><EvilIcons name="plus" size={29} style={styles.avatarIcon} /></TouchableOpacity></View>
+  )}
                 <Text style={styles.title}>Реєстрація</Text>
                 <View style={styles.input}>
                     <TextInput value={state.nickname} placeholder="Логін" onChangeText={(value)=>setState((prevState) => ({...prevState, nickname: value}))} style={styles.text} onFocus={()=>setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>              
@@ -110,6 +146,28 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         position: "absolute",
         top: -60,
+        backgroundColor: "rgba(246, 246, 246, 1)"
+    },
+    avatarBtn: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#fff",
+        width: 24, 
+        height: 24, 
+        borderRadius: 50,
+        position: "absolute",
+        top: 80,
+        left: 105,
+    },
+    avatarIcon: { 
+        color: "#FF6C00",
+    },
+    photo: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 16,
+        position: "absolute",
     },
     title: { 
         fontFamily: "Roboto-Medium",
