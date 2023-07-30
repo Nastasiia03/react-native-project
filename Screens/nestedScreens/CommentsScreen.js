@@ -1,14 +1,19 @@
 import React, {useState, useEffect} from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, SafeAreaView, ScrollView, Image, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform, } from "react-native";
 import { db } from "../../firebase/config";
 import { useSelector } from "react-redux";
 import { doc, collection, addDoc, getDocs, onSnapshot,} from "firebase/firestore";
 
-export default function CommentsScreen({route}) {
+
+
+export default function CommentsScreen({route, navigation}) {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [comment, setComment] = useState("");
   const [allComments, setAllComments] = useState([]);
-  const { postId } = route.params;
+  const { postId, photo } = route.params;
   const { nickname, stateChange } = useSelector(state => state.auth);
+  const [commentsCount, setCommentsCount] = useState(0);
+
   let unsubscribeListener;
   
 useEffect(() => {
@@ -22,6 +27,10 @@ return () => {
   }
 
 }}, [stateChange]);
+
+useEffect(() => {
+  navigation.setParams({ commentsCount: commentsCount });
+}, [commentsCount]);
 
   const createComment = async () => {
   const docRef = await doc(db, "posts", postId);
@@ -44,12 +53,21 @@ return () => {
             id: doc.id,
           }))
         ));
+
+      setCommentsCount(Number(allComments.length));
   };
 
+  const keyboardHide = () => {
+    setKeyboardVisible(false);
+    Keyboard.dismiss();
+    };
+
   return (
+    <TouchableWithoutFeedback onPress={keyboardHide}>
     <View style={styles.container}>
-    <SafeAreaView style={styles.wrapper}>
-              <FlatList
+   <KeyboardAvoidingView style={styles.form} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <Image source={{ uri: photo }} style={styles.photo} />
+            {!keyboardVisible &&  <FlatList
                 data={allComments}
                 renderItem={({ item }) => (
                   (
@@ -66,10 +84,14 @@ return () => {
                 )}
                 keyExtractor={(item) => item.id}
               />
-            </SafeAreaView>
-      <View style={styles.formInput}><TextInput onChangeText={setComment} placeholder="Коментар..."/></View>
+                      }
+            
+      <View style={styles.formInput}><TextInput  onChangeText={setComment} placeholder="Коментувати..." onFocus={() => setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/></View>
             <TouchableOpacity  style={styles.activeBtn} onPress={createComment}><Text style={styles.activeBtnText}>Залишити коментар</Text></TouchableOpacity>
+
+            </KeyboardAvoidingView>
     </View >
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -77,18 +99,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
      backgroundColor: "white",
-        paddingTop: 32, 
         paddingLeft: 16,
     paddingRight: 16,
-    alignItems: "center",
   },
-  wrapper: {
-    height: 350,
-    alignItems: "flex-end",
+  area: {
+    flex: 1,
+},
+form: {
+  flex: 1,
+  backgroundColor: "white",
+  width: "100%",
+  paddingLeft: 16,
+  paddingRight: 16,
+  marginBottom: 10,
+},
 
-    // borderColor: "black",
-    // borderWidth: 2,
-  },
   wrapperComment: {
     display: "flex",
     flexDirection: "row",
@@ -141,4 +166,10 @@ fontSize: 16,
         alignItems: "center",
 marginBottom: 20,
     },
+    photo: {
+      width: 343,
+      height: 240,
+      borderRadius: 8,
+marginBottom: 8,
+  },
 });

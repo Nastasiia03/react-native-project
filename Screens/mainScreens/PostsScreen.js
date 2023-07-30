@@ -3,32 +3,71 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Button } fro
 import { Feather } from '@expo/vector-icons'; 
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { db } from "../../firebase/config";
-import {collection, onSnapshot} from "firebase/firestore";
+import {collection, onSnapshot, query} from "firebase/firestore";
 import { useSelector } from "react-redux";
 
 export default function PostsScreen({route, navigation}) {
     const [posts, setPosts] = useState([]);
+    const [commentsCount, setCommentsCount] = useState({});
     const { stateChange } = useSelector(state => state.auth);
-    let unsubscribeListener;
+    let unsubscribePosts;
+    let unsubscribe; 
     
     const getAllPosts = async () => {
-        unsubscribeListener = await onSnapshot(collection(db, "posts"), (data) => {
+        unsubscribePosts = await onSnapshot(collection(db, "posts"), (data) => {
             const posts = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
             setPosts(posts);
+
+            posts.forEach((post) => {
+                getCommentsCount(post.id);    
+              });
         });
     };
 
     useEffect(() => {
         if(stateChange) {
-        getAllPosts();
+       getAllPosts();
     };
+    
+    return () => {
+        if (unsubscribePosts) {
+            unsubscribePosts();
+          };
+      };
 
-        return () => {
-            if (unsubscribeListener) {
-                unsubscribeListener();
-            }
+}, [stateChange]);
 
-}}, [stateChange]);
+useEffect(() => {
+    if (route.params?.commentsCount) {
+      setCommentsCount((prev) => ({
+        ...prev,
+        [route.params.postId]: route.params.commentsCount,
+      }));
+    }
+    
+    return () => {
+        if (unsubscribe) {
+            unsubscribe();
+          };
+      };
+
+  }, [route.params]);
+
+  const getCommentsCount = async (postId) => {
+    try {
+      const commentsRef = collection(db, `posts/${postId}/comments`);
+      const queryRef = query(commentsRef);
+      unsubscribe = onSnapshot(queryRef, (querySnapshot) => {
+        const commentsCount = querySnapshot.docs.length;
+        setCommentsCount((prev) => ({ ...prev, [postId]: commentsCount }));
+      });
+    //   return () => unsubscribe();
+    } catch (error) {
+      console.log(error);
+      setCommentsCount((prev) => ({ ...prev, [postId]: 0 }));
+      return () => {};
+    }
+  };
 
 
     return <View style={styles.container}>
@@ -44,8 +83,8 @@ export default function PostsScreen({route, navigation}) {
                 <Text style={styles.name}>{item.info.postName}</Text>
             <View style={styles.postsContainer}>
                 <View style={styles.infoContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
-                <Text style={styles.count}>0</Text></View>
+                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id, photo: item.photo})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
+                <Text style={styles.count}>{commentsCount[item.id] || 0}</Text></View>
                 <View style={styles.infoContainer}>
                     <TouchableOpacity onPress={() => navigation.navigate("Локації", { location: item.location })}><SimpleLineIcons name="location-pin" size={24} style={styles.locationIcon} />
                     </TouchableOpacity>
