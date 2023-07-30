@@ -103,6 +103,12 @@ export default function CreatePostsScreen({navigation}) {
            console.log(location);
     };
 
+    const removeFields = () => {
+        setInfo(initialState);
+        setPhoto("");
+        setIsButtonDisabled(true);
+      };
+
     return <View style={styles.container}>
         <View style={styles.cameraWrapper}>
         <Camera style={styles.imageContainer} ref={setCamera}>
@@ -120,7 +126,7 @@ export default function CreatePostsScreen({navigation}) {
             <View style={styles.formInput}><SimpleLineIcons name="location-pin" size={24} color="rgba(189, 189, 189, 1)"/><TextInput value={info.locationName} onChangeText={(value)=>setInfo((prevState) => ({...prevState, locationName: value}))} placeholder="Місцевість..."/></View></View>
             <TouchableOpacity disabled={isButtonDisabled} style={isButtonDisabled ? styles.btn : styles.activeBtn} onPress={sendPhoto}><Text style={isButtonDisabled ? styles.btnText : styles.activeBtnText}>Опублікувати</Text></TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.deleteBtn}><Feather name="trash-2" size={24} color="rgba(189, 189, 189, 1)" /></TouchableOpacity>
+        <TouchableOpacity disabled={isButtonDisabled} style={isButtonDisabled ? styles.deleteBtn : styles.activeDeleteBtn} onPress={removeFields}><Feather name="trash-2" size={24} style={isButtonDisabled ? styles.disabledIcon : styles.activeIcon}/></TouchableOpacity>
     </View>
 }; 
 
@@ -223,6 +229,22 @@ fontSize: 16,
         display: "flex",
         justifyContent: "center", 
         alignItems: "center"
+    },
+    activeDeleteBtn: {
+    display: "flex",
+    width: 70,
+    height: 40,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center", 
+    borderRadius: 20,
+     backgroundColor: "#FF6C00", 
+    },
+    disabledIcon: {
+color: "rgba(189, 189, 189, 1)"
+    },
+    activeIcon: {
+color: "#fff",
     },
     takePhotoContainer: {
         position: "absolute",

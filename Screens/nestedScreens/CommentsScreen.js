@@ -1,10 +1,17 @@
 import React, {useState, useEffect} from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, SafeAreaView, ScrollView, Image, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform, } from "react-native";
+import { format } from "date-fns";
+import { en } from "date-fns/locale";
 import { db } from "../../firebase/config";
 import { useSelector } from "react-redux";
 import { doc, collection, addDoc, getDocs, onSnapshot,} from "firebase/firestore";
+import { AntDesign } from '@expo/vector-icons';
 
-
+const formatDate = (date) => {
+  return format(Date.parse(date), "dd MMMM, yyyy | HH:mm:ss", {
+    locale: en,
+  });
+};
 
 export default function CommentsScreen({route, navigation}) {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -38,6 +45,7 @@ useEffect(() => {
     await addDoc(collection(docRef, "comments"), {
       comment,
       nickname,
+      postedDate: formatDate(new Date())
     });
 
     setComment("");
@@ -67,7 +75,7 @@ useEffect(() => {
     <View style={styles.container}>
    <KeyboardAvoidingView style={styles.form} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Image source={{ uri: photo }} style={styles.photo} />
-            {!keyboardVisible &&  <FlatList
+            {!keyboardVisible &&  <FlatList style={styles.commentsList}
                 data={allComments}
                 renderItem={({ item }) => (
                   (
@@ -75,9 +83,7 @@ useEffect(() => {
                       <View style={styles.commentContainer}>
                         <Text style={styles.userName}>{item.nickname}</Text>
                         <Text style={styles.userComment}>{item.comment}</Text>
-                        {/* <Text style={styles.userPostedDate}>
-                          {item.postedDate}
-                        </Text> */}
+                        <Text style={styles.postedDate}>{item.postedDate}</Text>
                       </View>
                     </View>
                   )
@@ -86,9 +92,9 @@ useEffect(() => {
               />
                       }
             
-      <View style={styles.formInput}><TextInput  onChangeText={setComment} placeholder="Коментувати..." onFocus={() => setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/></View>
-            <TouchableOpacity  style={styles.activeBtn} onPress={createComment}><Text style={styles.activeBtnText}>Залишити коментар</Text></TouchableOpacity>
-
+      <View style={styles.formInput}><TextInput style={styles.textInput} onChangeText={setComment} placeholder="Коментувати..." onFocus={() => setKeyboardVisible(true)} onSubmitEditing={() => setKeyboardVisible(false)}/>
+      <TouchableOpacity  style={styles.activeBtn} onPress={createComment}><AntDesign name="arrowup" size={20} color="#fff" /></TouchableOpacity>
+      </View>
             </KeyboardAvoidingView>
     </View >
     </TouchableWithoutFeedback>
@@ -101,6 +107,8 @@ const styles = StyleSheet.create({
      backgroundColor: "white",
         paddingLeft: 16,
     paddingRight: 16,
+    paddingTop: 32,
+    alignItems: "center",
   },
   area: {
     flex: 1,
@@ -111,6 +119,7 @@ form: {
   width: "100%",
   paddingLeft: 16,
   paddingRight: 16,
+  alignItems: "center",
   marginBottom: 10,
 },
 
@@ -142,14 +151,12 @@ form: {
   },
       activeBtn: {
 display: "flex",
-    width: 343,
-    paddingTop: 16,
-    paddingLeft: 32,
-    paddingRight: 32,
-    paddingBottom: 16,
+width: 34,
+height: 34,
     flexDirection: "column",
     alignItems: "center",
-    borderRadius: 100,
+    justifyContent: "center",
+    borderRadius: 50,
     backgroundColor: "#FF6C00", 
   },
       activeBtnText: {
@@ -160,16 +167,34 @@ fontSize: 16,
       formInput: {
         width: 343,
         height: 50,
-        borderBottomWidth: 1,
-        borderBottomColor: "rgba(232, 232, 232, 1)",
+        borderWidth: 1,
+        borderColor: "#E8E8E8",
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "space-between",
 marginBottom: 20,
+backgroundColor: "#F6F6F6",
+borderRadius: 100,
+paddingLeft: 16,
+paddingRight: 8,
+    },
+    textInput: {
+fontSize: 16,
     },
     photo: {
       width: 343,
       height: 240,
       borderRadius: 8,
-marginBottom: 8,
+marginBottom: 32,
+  },
+  commentsList: {
+    marginBottom: 31
+  },
+  postedDate: {
+    fontFamily: "Roboto",
+    fontSize: 10,
+    lineHeight: 11.72,
+    color: "#BDBDBD",
+    textAlign: "right",
   },
 });
