@@ -85,7 +85,7 @@ export default function CreatePostsScreen({navigation}) {
          await uploadBytes(storageRef, file);
         
         const processedPhoto = await getDownloadURL(storageRef);
-
+console.log(processedPhoto)
         return processedPhoto;
     };
 
@@ -101,6 +101,7 @@ export default function CreatePostsScreen({navigation}) {
            uploadPostToServer();
            console.log(info);
            console.log(location);
+           console.log(photo)
     };
 
     const removeFields = () => {

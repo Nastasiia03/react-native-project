@@ -79,15 +79,14 @@ const getCommentsCount = async (postId) => {
     return <View style={styles.container}>
         <ImageBackground source={PhotoBG} resizeMode="cover" style={styles.image}>
             <View style={styles.profile}>
-                <Image style={styles.avatar} source={photo} />
-                <TouchableOpacity style={styles.changeBtn}><AntDesign name="closecircleo" size={24} color="#E8E8E8" /></TouchableOpacity>
+                <Image style={styles.avatar} source={{ uri: photo }} />
                 <Text style={styles.userName}>{nickname}</Text>
                 <View style={styles.postsList}><FlatList data={userPosts} keyExtractor={(item, index) => index.toString()} renderItem={({ item }) => <View style={{ marginBottom: 10 }}>
                 <Image source={{ uri: item.photo }} style={styles.photo} />
                 <Text style={styles.name}>{item.info.postName}</Text>
             <View style={styles.postsContainer}>
                 <View style={styles.infoContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id, photo: item.photo})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id, image: item.photo})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
                 <Text style={styles.count}>{commentsCount[item.id] || 0}</Text></View>
                 <View style={styles.infoContainer}>
                     <TouchableOpacity onPress={() => navigation.navigate("Локації", { location: item.location })}><SimpleLineIcons name="location-pin" size={24} style={styles.locationIcon} />

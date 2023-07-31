@@ -6,7 +6,10 @@ import PhotoBG from "../assets/images/PhotoBG.png";
 import { EvilIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch} from "react-redux";
-import {authSignUpUser} from "../redux/auth/authOperations";
+import { authSignUpUser } from "../redux/auth/authOperations";
+import { uploadBytes, uploadBytesResumable, ref, getDownloadURL } from "firebase/storage";
+import { storage, db } from "../firebase/config";
+import { addDoc, collection } from "firebase/firestore";
 
 const initialState = {
 nickname: "",
@@ -51,23 +54,57 @@ const handlePhotoSelection = async () => {
   }
 };
 
+    console.log(photo)
+    
     const clearPhoto = () => {
     setPhoto(null);
     };
+
+    const uploadPhotoToServer = async () => {
+    try {
+      const response = await fetch(photo.uri);
+
+      const file = await response.blob();
+
+        const uniquePostId = Date.now().toString();
+        console.log(uniquePostId);
+      const storageRef = ref(storage, `avatars/${uniquePostId}`);
+      uploadBytesResumable(storageRef, file);
+await new Promise((resolve) => setTimeout(resolve, 5000));
+      const getStorageRef = await getDownloadURL(storageRef);
+console.log(getStorageRef)
+      return getStorageRef;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+    };
     
-    const handleSubmit = () => {
-    // console.log(state);
-        setState(initialState);
-        dispatch(authSignUpUser(state));
+    const handleSubmit = async () => {
+        try {
+            const avatar = photo ? await uploadPhotoToServer() : null;
+            const user = {
+                nickname: state.nickname,
+                email: state.email,
+                password: state.password,
+                photo: avatar
+            };
+            dispatch(authSignUpUser(user));
+
+            const userRef = collection(db, "users");
+    await addDoc(userRef, {
+      nickname: user.nickname,
+      email: user.email,
+      photo: user.photo,
+    });
+            
+            setState(initialState);
+            setPhoto(null);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
-const xml = `
-<svg xmlns="http://www.w3.org/2000/svg" width="132" height="120" viewBox="0 0 132 120" fill="none">
-<rect width="120" height="120" rx="16" fill="#F6F6F6"/>
-<circle cx="119.5" cy="93.5" r="12" fill="white" stroke="#FF6C00"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M120 87H119V93H113V94H119V100H120V94H126V93H120V87Z" fill="#FF6C00"/>
-</svg>
-`
 
     return (
         <TouchableWithoutFeedback onPress={keyboardHide}>

@@ -26,7 +26,8 @@ export default function PostsScreen({route, navigation}) {
 
     useEffect(() => {
         if(stateChange) {
-       getAllPosts();
+            getAllPosts();
+            console.log(photo);
     };
     
     return () => {
@@ -72,7 +73,7 @@ useEffect(() => {
 
     return <View style={styles.container}>
         <View style={styles.userContainer}>
-            <Image source={photo} style={styles.image}></Image>
+            <Image source={{uri: photo}} style={styles.image}></Image>
             <View style={styles.textContainer}>
             <Text style={styles.userName}>{nickname}</Text>
                 <Text style={styles.userEmail}>{email}</Text>    
@@ -83,7 +84,7 @@ useEffect(() => {
                 <Text style={styles.name}>{item.info.postName}</Text>
             <View style={styles.postsContainer}>
                 <View style={styles.infoContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id, photo: item.photo})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("Коментарі", {postId: item.id, image: item.photo})}><Feather name="message-circle" size={24} style={styles.comment} /></TouchableOpacity>
                 <Text style={styles.count}>{commentsCount[item.id] || 0}</Text></View>
                 <View style={styles.infoContainer}>
                     <TouchableOpacity onPress={() => navigation.navigate("Локації", { location: item.location })}><SimpleLineIcons name="location-pin" size={24} style={styles.locationIcon} />

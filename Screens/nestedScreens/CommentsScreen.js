@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { en } from "date-fns/locale";
 import { db } from "../../firebase/config";
 import { useSelector } from "react-redux";
-import { doc, collection, addDoc, getDocs, onSnapshot,} from "firebase/firestore";
+import { doc, collection, addDoc, getDocs, onSnapshot,query, where} from "firebase/firestore";
 import { AntDesign } from '@expo/vector-icons';
 
 const formatDate = (date) => {
@@ -17,8 +17,8 @@ export default function CommentsScreen({route, navigation}) {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [comment, setComment] = useState("");
   const [allComments, setAllComments] = useState([]);
-  const { postId, photo } = route.params;
-  const { nickname, stateChange } = useSelector(state => state.auth);
+  const { postId, image } = route.params;
+  const { nickname, stateChange, photo} = useSelector(state => state.auth);
   const [commentsCount, setCommentsCount] = useState(0);
 
   let unsubscribeListener;
@@ -51,16 +51,44 @@ useEffect(() => {
     setComment("");
   };
 
+  const fetchAvatarForNickname = async (nickname) => {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("nickname", "==", nickname));
+  const userDocs = await getDocs(q);
+
+  if (!userDocs.empty) {
+    const userData = userDocs.docs[0].data();
+    const avatar = userData.photo;
+
+    if (typeof avatar === "string" && avatar !== "") {
+      console.log(`Avatar URL found for ${nickname}: ${avatar}`);
+      return avatar;
+    } else {
+      console.log(`Invalid or empty avatar URL for ${nickname}`);
+      return null;
+    }
+  } else {
+    console.log(`User data not found for ${nickname}`);
+    return null;
+  }
+};
+
+
   const getAllComments = async () => {
     const docRef = await doc(db, "posts", postId);
 
-    unsubscribeListener = await onSnapshot(collection(docRef, "comments"), (data) =>
-        setAllComments(
-          data.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          }))
-        ));
+    unsubscribeListener = await onSnapshot(collection(docRef, "comments"), async (data) => {
+      const commentsData = await Promise.all(
+        data.docs.map(async (doc) => {
+          const commentData = doc.data();
+          const avatar = await fetchAvatarForNickname(commentData.nickname);
+          return { ...commentData, id: doc.id, avatar };
+        })
+      );
+      setAllComments(commentsData);
+    });
+
+    
 
       setCommentsCount(Number(allComments.length));
   };
@@ -74,12 +102,13 @@ useEffect(() => {
     <TouchableWithoutFeedback onPress={keyboardHide}>
     <View style={styles.container}>
    <KeyboardAvoidingView style={styles.form} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <Image source={{ uri: photo }} style={styles.photo} />
+      <Image source={{ uri: image }} style={styles.photo} />
             {!keyboardVisible &&  <FlatList style={styles.commentsList}
                 data={allComments}
                 renderItem={({ item }) => (
                   (
                     <View style={styles.wrapperComment}>
+                      <Image style={styles.avatar} source={{uri: item.avatar}}/>
                       <View style={styles.commentContainer}>
                         <Text style={styles.userName}>{item.nickname}</Text>
                         <Text style={styles.userComment}>{item.comment}</Text>
@@ -128,12 +157,12 @@ form: {
     flexDirection: "row",
   },
   commentContainer: {
-    padding: 16,
+    padding: 14,
     marginBottom: 24,
     borderRadius: 6,
     backgroundColor: "rgba(0, 0, 0, 0.03)",
     borderColor: "rgba(0, 0, 0, 0.03)",
-    width: 299,
+    width: 290,
   },
   userName: {
     fontFamily: "Roboto",
@@ -196,5 +225,11 @@ marginBottom: 32,
     lineHeight: 11.72,
     color: "#BDBDBD",
     textAlign: "right",
+  },
+   avatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 50,
+    marginRight: 10,
   },
 });
