@@ -23,11 +23,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "jsEngine": "jsc"
+      "jsEngine": "jsc",
+      "package": "com.anastasiia03.MyProject"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "jsEngine": "hermes"
+    "jsEngine": "hermes",
+    "extra": {
+      "eas": {
+        "projectId": "e60c1657-854d-4467-ba19-94cef91b6ccb"
+      }
+    }
   }
 }
